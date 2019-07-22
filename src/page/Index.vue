@@ -25,7 +25,7 @@
           background-color="#24292e"
           router
         >
-          <template v-for="(item,index) in $router.routes">
+          <template v-for="(item,index) in $router.options.routes">
             <el-submenu :index="index+''" v-if="!item.meta.leaf && item.children" :key="index">
               <template slot="title">
                 <i :class="item.meta.icon" class="iconfont mar"></i>
@@ -41,6 +41,7 @@
                 <span class="text">{{child.name}}</span>
               </el-menu-item>
             </el-submenu>
+
             <el-menu-item
               v-if="item.meta.leaf && item.children"
               :index="item.children[0].path"
