@@ -57,31 +57,31 @@
         </el-table-column>
         <el-table-column label="分类" label-class-name="head">
           <template slot-scope="scope">
-            {{
-            scope.row.type === 1
-            ? 'Code'
-            : scope.row.type === 2
-            ? 'Think'
-            : 'Music'
-            }}
+            <!--{{-->
+            <!--scope.row.type === 1-->
+            <!--? 'Code'-->
+            <!--: scope.row.type === 2-->
+            <!--? 'Think'-->
+            <!--: 'Music'-->
+            <!--}}-->
           </template>
         </el-table-column>
         <el-table-column label="公开" label-class-name="head">
           <template slot-scope="scope">
-            {{
-            scope.row.publish === 1
-            ? '公开'
-            : '私密'
-            }}
+            <!--{{-->
+            <!--scope.row.publish === 1-->
+            <!--? '公开'-->
+            <!--: '私密'-->
+            <!--}}-->
           </template>
         </el-table-column>
         <el-table-column label="状态" label-class-name="head">
           <template slot-scope="scope">
-            {{
-            scope.row.state === 1
-            ? '发布'
-            : '草稿'
-            }}
+            <!--{{-->
+            <!--scope.row.state === 1-->
+            <!--? '发布'-->
+            <!--: '草稿'-->
+            <!--}}-->
           </template>
         </el-table-column>
         <el-table-column label="操作" width="300" label-class-name="head" fixed="right">
@@ -123,7 +123,9 @@
                 v-if="scope.row.state === 2"
                 :disabled="scope.row.deleteing"
                 @click="dele(scope.row)"
-              >{{ scope.row.deleteing ? '删除中' : '删 除' }}</el-button>
+              >
+                <!--{{ scope.row.deleteing ? '删除中' : '删 除' }}-->
+              </el-button>
             </transition-group>
           </template>
         </el-table-column>
@@ -144,11 +146,18 @@
 
 <script>
 import Card from "../../components/Card.vue";
+import { mapActions, mapState, mapMutations, mapGetters } from "vuex";
+
 export default {
+  components: {
+    Card
+  },
+
   data() {
     return {
+      width: '48px',
       Item: {},
-      IList: [
+      type: [
         {
           name: "标签",
           typeName: "tag",
@@ -199,13 +208,18 @@ export default {
         state: ""
       },
       keyword:'',
-      currentPage:''
+      currentPage: 1
     };
   },
 
-  component: ["Card"],
 
   computed:{
+    ...mapState({
+      articles: state => state.articles.articles,
+//      noMore: state => state.article.noMoreData,
+      page: state => state.articles.page,
+      defaultLimit: state => state.articles.defaultLimit,
+    }),
     list() {
       return []
     },
@@ -220,7 +234,15 @@ export default {
   },
 
 
+  created() {
+    this.getData()
+  },
+
   methods: {
+    ...mapActions({
+      getAllArticles: "articles/GET_ALL_ARTICLES",
+    }),
+
     fetch(){
 
     },
@@ -242,8 +264,12 @@ export default {
     dele() {
 
     },
-    getData() {
-
+    async getData() {
+      await this.getAllArticles({
+        page: this.page || 1,
+        limit: this.defaultLimit || 8,
+        isPublish: true
+      })
     },
   }
 
