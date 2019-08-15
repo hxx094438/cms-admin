@@ -12,6 +12,8 @@ export default {
     defaultLimit: 4,
     article: {},
     articlesLikeArr: [], // 子项为文章aid
+    fetch: false,
+    list: []
   },
   mutations: {
     SET_POSTS_BASE_INFO (state, data) {
@@ -28,10 +30,62 @@ export default {
 
 
     //草稿
-
     SET_DRAFT: (state, draft) => {
       state.draft = draft
     },
+
+    REQUEST_LIST: (state) => {
+      state.fetch = true
+    },
+
+    REQUEST_LIST_SUCCESS: (state, payload) => {
+      state.fetch = false
+      state.list = payload.list
+      state.total = payload.total
+    },
+
+    REQUEST_LIST_FAIL: (state) => {
+      state.fetch = false
+      state.list = []
+      state.total = 0
+    },
+
+    DELETE_ARTICLE: (state, article) => {
+      (state.list.find((item) => item._id === article._id)).deleteing = true
+    },
+
+    DELETE_ARTICLE_FINAL: (state, article) => {
+      (state.list.find((item) => item._id === article._id)).deleteing = false
+    },
+
+    PATCH_HERO_SUCCESS: (state, article) => {
+      const list = (
+        state.list.find((item) => item._id === article._id)
+      )
+      for (const key in article) {
+        if (article.hasOwnProperty(key)) {
+          list[key] = article[key]
+        }
+      }
+    },
+
+    REQUEST_DETAIL_SUCCESS: (state, article) => {
+      state.detail = { ...article }
+      state.fetch = false
+    },
+
+    REQUEST_DETAIL_FAIL: (state) => {
+      state.fetch = false
+    },
+
+    POST_ARTICLE: (state) => {
+      state.posting = true
+    },
+
+    POST_ARTICLE_FINAL: (state) => {
+      state.posting = false
+    }
+
 
   },
   actions: {
@@ -41,15 +95,17 @@ export default {
         const {data, message, code} = res
         console.log('data',data,code)
         if( code === 0) {
-          console.log('------------------11111111111')
-          // if(params.add) {
-          //   commit('ADD_ARTICLES',data.articles)
-          // } else {
-          //   console.log('------------------222222222',{...params,...data.articles})
-          //
-          //   commit('SET_POSTS_BASE_INFO', {...params,...data})
-          // }
+          state.list = data.articles.map( item => {
+            return {...item , deleteing: false}
+          })
+          state.total = data.total
+          commit('REQUEST_LIST_SUCCESS', { list:state.list
+            , total: state.total
+          })
+        } else {
+          commit('REQUEST_LIST_FAIL')
         }
+        return res
 
       })
     },
@@ -110,7 +166,20 @@ export default {
 
     UPDATE_ARTICLE_LIKE_ARR({state, commit}, payload) {
       commit('UPDATE_ARTICLE_LIKE',payload)
-    }
+    },
+
+    // 改变状态
+    async patchArt (
+      { commit },
+      article
+    ) {
+      const res = await service.patchArt(article)
+      if (res && res.code === 1) {
+        success('修改成功')
+        commit('PATCH_HERO_SUCCESS', article)
+      } else error(res.message)
+      return res
+    },
 
 
   }

@@ -219,18 +219,12 @@ export default {
 //      noMore: state => state.article.noMoreData,
       page: state => state.articles.page,
       defaultLimit: state => state.articles.defaultLimit,
+      fetch: state => state.articles.fetch,
+      list: state => state.articles.list,
+      total: state => state.articles.total,
+      tag: state => state.articles.tag.list,
+
     }),
-    list() {
-      return []
-    },
-
-    total() {
-      return 1
-    },
-
-    tag() {
-      return []
-    }
   },
 
 
@@ -243,26 +237,38 @@ export default {
       getAllArticles: "articles/GET_ALL_ARTICLES",
     }),
 
-    fetch(){
-
+    changeState (row, type, state) {
+      this.$store.dispatch('article/patchArt', {
+        _id: row._id,
+        type: type,
+        publish: state
+      })
     },
 
-    pageChange() {
-
+    pageChange(val) {
+      this.currentPage = val
+      this.getData()
     },
 
-    changeType() {
-
-    },
-    edit() {
-
-    },
-    changeState() {
-
+    changeType(e) {
+      this.para[e.typeName] = e.id
+      this.getData()
     },
 
-    dele() {
+    edit(row) {
+      this.$router.push(`/article/release?id=${row._id}`)
+    },
 
+
+    dele(row) {
+      this.$confirm('确定删除此文章吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const res = await this.$store.dispatch('article/deleteArt', { _id: row._id })
+        if (res.code === 1) this.getData()
+      }).catch(error => console.error(error))
     },
     async getData() {
       await this.getAllArticles({
