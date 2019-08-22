@@ -8,12 +8,14 @@ import VueSimplemde from 'vue-simplemde'
 import store from './store'
 import axios from 'axios'
 import './assets/scss/index.scss'
+import { format } from './filters/index'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
 
 Vue.use(ElementUi)
 Vue.use(VueSimplemde)
+Vue.filter('format', format)
 
 /* eslint-disable no-new */
 new Vue({

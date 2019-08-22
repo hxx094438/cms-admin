@@ -22,10 +22,10 @@
             <el-form label-position="left" class="table-expand">
               <el-form-item label="标签">
                 <span
-                  v-for="item in props.row.tag"
-                  :key="item._id"
+                  v-for="(item,index) in props.row.tags"
+                  :key="index"
                   style="margin-right: 10px;"
-                >{{ item.name }}</span>
+                >{{ item }}</span>
               </el-form-item>
               <el-form-item label="关键字">
                 <span>{{ props.row.keyword }}</span>
@@ -36,7 +36,11 @@
             </el-form>
           </template>
         </el-table-column>
-        <el-table-column prop="id" label="文章id" label-class-name="head" :width="100"></el-table-column>
+        <el-table-column prop="id" label="文章id" label-class-name="head" :width="100">
+          <template slot-scope="scope">
+            {{ scope.row.aid }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="title"
           label="文章标题"
@@ -45,25 +49,25 @@
           show-overflow-tooltip
         >
           <template slot-scope="scope">
+            <!--:href="`https://hxx1994.site/article/${scope.row._id}`"-->
             <a
-              :href="`https://jkchao.cn/article/${scope.row._id}`"
               class="article-link"
               target="_blank"
             >{{ scope.row.title }}</a>
           </template>
         </el-table-column>
         <el-table-column prop="date" label="发布日期" width="180" label-class-name="head">
-          <template slot-scope="scope">{{ scope.row.create_at | format('yyyy-MM-dd hh.mm')}}</template>
+          <template slot-scope="scope">{{ scope.row.date | format('yyyy-MM-dd hh.mm')}}</template>
         </el-table-column>
         <el-table-column label="分类" label-class-name="head">
           <template slot-scope="scope">
-            <!--{{-->
-            <!--scope.row.type === 1-->
-            <!--? 'Code'-->
-            <!--: scope.row.type === 2-->
-            <!--? 'Think'-->
-            <!--: 'Music'-->
-            <!--}}-->
+            {{
+            scope.row.type === 1
+            ? 'Code'
+            : scope.row.type === 2
+            ? 'Think'
+            : 'Music'
+            }}
           </template>
         </el-table-column>
         <el-table-column label="公开" label-class-name="head">
@@ -77,11 +81,11 @@
         </el-table-column>
         <el-table-column label="状态" label-class-name="head">
           <template slot-scope="scope">
-            <!--{{-->
-            <!--scope.row.state === 1-->
-            <!--? '发布'-->
-            <!--: '草稿'-->
-            <!--}}-->
+            {{
+            scope.row.state === 1 ?
+             '发布'
+            : '草稿'
+            }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="300" label-class-name="head" fixed="right">
@@ -124,7 +128,7 @@
                 :disabled="scope.row.deleteing"
                 @click="dele(scope.row)"
               >
-                <!--{{ scope.row.deleteing ? '删除中' : '删 除' }}-->
+                {{ scope.row.deleteing ? '删除中' : '删 除' }}
               </el-button>
             </transition-group>
           </template>
