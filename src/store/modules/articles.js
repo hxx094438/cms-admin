@@ -12,8 +12,19 @@ export default {
     defaultLimit: 4,
     article: {},
     articlesLikeArr: [], // 子项为文章aid
+    posting: false,
     fetch: false,
-    list: []
+    list: [],
+    detail: {
+      title: '',
+      keyword: '',
+      thumb: '',
+      state: 0,
+      publish: 0,
+      type: 0,
+      descript: '',
+      tag: []
+    }
   },
   mutations: {
     SET_POSTS_BASE_INFO (state, data) {
@@ -60,7 +71,7 @@ export default {
 
     PATCH_HERO_SUCCESS: (state, article) => {
       const list = (
-        state.list.find((item) => item._id === article._id)
+        state.list.find((item) => item.aid === article.aid)
       )
       for (const key in article) {
         if (article.hasOwnProperty(key)) {
@@ -112,7 +123,7 @@ export default {
 
 
     DEL_ARTICLE({dispatch}, payload) {
-      return model.delArticle(payload.aid)
+      return service.delArticle(payload.aid)
         .then(() => {
           const {data, message} = res
           if( data.code === 0) {
@@ -150,7 +161,7 @@ export default {
 
 
     SAVE_ARTICLE({state, commit}, payload) {
-      return model.saveArticle({article: state.article, ...payload})
+      return service.saveArticle({article: state.article, ...payload})
         .then(() => {
           const {data, message} = res
           if( data.code === 0) {
@@ -169,14 +180,15 @@ export default {
     },
 
     // 改变状态
-    async patchArt (
+    async PATCH_ARTICLE (
       { commit },
-      article
+      params
     ) {
-      const res = await service.patchArt(article)
-      if (res && res.code === 1) {
+      console.log('PATCH_ARTICLE',params)
+      const res = await service.patchArt(params)
+      if (res && res.code === 0) {
         success('修改成功')
-        commit('PATCH_HERO_SUCCESS', article)
+        commit('PATCH_HERO_SUCCESS', params.article)
       } else error(res.message)
       return res
     },

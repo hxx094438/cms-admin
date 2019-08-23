@@ -7,7 +7,6 @@
  * @returns {string}
  */
 export function format (time, format){
-  debugger
   let res = ''
   const date = new Date(time)
   const o = {

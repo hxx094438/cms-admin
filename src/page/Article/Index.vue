@@ -72,11 +72,11 @@
         </el-table-column>
         <el-table-column label="公开" label-class-name="head">
           <template slot-scope="scope">
-            <!--{{-->
-            <!--scope.row.publish === 1-->
-            <!--? '公开'-->
-            <!--: '私密'-->
-            <!--}}-->
+            {{
+            scope.row.isPublish
+            ? '公开'
+            : '私密'
+            }}
           </template>
         </el-table-column>
         <el-table-column label="状态" label-class-name="head">
@@ -91,34 +91,39 @@
         <el-table-column label="操作" width="300" label-class-name="head" fixed="right">
           <template slot-scope="scope">
             <transition-group name="btn" tag="div">
-              <el-button type="info" size="small" key="1" @click="edit(scope.row)">修改</el-button>
+              <el-button
+                type="info"
+                size="small"
+                key="1"
+                @click="edit(scope.row)"
+              >修改</el-button>
               <el-button
                 type="danger"
                 size="small"
                 key="2"
                 v-if="scope.row.publish === 1"
-                @click="changeState(scope.row, 'publish', 2)"
+                @click="changeState(scope.row, {isPublish: 0})"
               >私密</el-button>
               <el-button
                 type="success"
                 size="small"
                 key="3"
                 v-else
-                @click="changeState(scope.row, 'publish', 1)"
+                @click="changeState(scope.row, {isPublish: 1})"
               >公开</el-button>
               <el-button
                 type="success"
                 size="small"
                 key="4"
                 v-if="scope.row.state === 2"
-                @click="changeState(scope.row, 'state', 1)"
+                @click="changeState(scope.row, {state: 1})"
               >发布</el-button>
               <el-button
                 type="danger"
                 size="small"
                 key="5"
                 v-else
-                @click="changeState(scope.row, 'state', 2)"
+                @click="changeState(scope.row, {state: 0})"
               >草稿</el-button>
               <el-button
                 type="danger"
@@ -239,13 +244,14 @@ export default {
   methods: {
     ...mapActions({
       getAllArticles: "articles/GET_ALL_ARTICLES",
+      patchActicle: 'articles/PATCH_ARTICLE'
     }),
 
-    changeState (row, type, state) {
-      this.$store.dispatch('article/patchArt', {
-        _id: row._id,
-        type: type,
-        publish: state
+    changeState (row, params) {
+      console.log('row',params)
+      this.patchActicle({
+        article: row,
+        ...params
       })
     },
 
@@ -262,7 +268,6 @@ export default {
     edit(row) {
       this.$router.push(`/article/release?id=${row._id}`)
     },
-
 
     dele(row) {
       this.$confirm('确定删除此文章吗？', '提示', {
