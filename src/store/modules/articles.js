@@ -24,7 +24,8 @@ export default {
       type: 0,
       descript: '',
       tag: []
-    }
+    },
+    tags: []
   },
   mutations: {
     SET_POSTS_BASE_INFO (state, data) {
@@ -39,6 +40,9 @@ export default {
       state.articles = [...state.articles, ...articles]
     },
 
+    SET_TAGS: (state, tags) => {
+      state.tags = tags
+    },
 
     //草稿
     SET_DRAFT: (state, draft) => {
@@ -101,7 +105,6 @@ export default {
   },
   actions: {
     GET_ALL_ARTICLES ({state, commit}, params) {
-      console.log('params',params)
       return service.getAllArticles(params).then( res => {
         const {data, message, code} = res
         console.log('data',data,code)
@@ -117,7 +120,16 @@ export default {
           commit('REQUEST_LIST_FAIL')
         }
         return res
+      })
+    },
 
+    GET_TAGS ( {state, commit}, params) {
+      return service.getTags(params).then( res => {
+        const {data, message, code} = res
+        if( code === 0) {
+          commit('SET_TAGS', data)
+        }
+        return res
       })
     },
 

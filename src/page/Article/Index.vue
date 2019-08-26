@@ -63,10 +63,10 @@
           <template slot-scope="scope">
             {{
             scope.row.type === 1
-            ? 'Code'
-            : scope.row.type === 2
-            ? 'Think'
-            : 'Music'
+              ? 'Code'
+              : scope.row.type === 2
+              ? 'Think'
+              : 'Music'
             }}
           </template>
         </el-table-column>
@@ -74,8 +74,8 @@
           <template slot-scope="scope">
             {{
             scope.row.isPublish
-            ? '公开'
-            : '私密'
+              ? '公开'
+              : '私密'
             }}
           </template>
         </el-table-column>
@@ -83,8 +83,8 @@
           <template slot-scope="scope">
             {{
             scope.row.state === 1 ?
-             '发布'
-            : '草稿'
+              '发布'
+              : '草稿'
             }}
           </template>
         </el-table-column>
@@ -96,35 +96,40 @@
                 size="small"
                 key="1"
                 @click="edit(scope.row)"
-              >修改</el-button>
+              >修改
+              </el-button>
               <el-button
                 type="danger"
                 size="small"
                 key="2"
-                v-if="scope.row.publish === 1"
-                @click="changeState(scope.row, {isPublish: 0})"
-              >私密</el-button>
+                v-if="scope.row.isPublish"
+                @click="changeState(scope.row, {isPublish: false})"
+              >私密
+              </el-button>
               <el-button
                 type="success"
                 size="small"
                 key="3"
                 v-else
-                @click="changeState(scope.row, {isPublish: 1})"
-              >公开</el-button>
+                @click="changeState(scope.row, {isPublish: true})"
+              >公开
+              </el-button>
               <el-button
                 type="success"
                 size="small"
                 key="4"
                 v-if="scope.row.state === 2"
                 @click="changeState(scope.row, {state: 1})"
-              >发布</el-button>
+              >发布
+              </el-button>
               <el-button
                 type="danger"
                 size="small"
                 key="5"
                 v-else
                 @click="changeState(scope.row, {state: 0})"
-              >草稿</el-button>
+              >草稿
+              </el-button>
               <el-button
                 type="danger"
                 size="small"
@@ -154,170 +159,193 @@
 </template>
 
 <script>
-import Card from "../../components/Card.vue";
-import { mapActions, mapState, mapMutations, mapGetters } from "vuex";
+  import Card from "../../components/Card.vue";
+  import {mapActions, mapState, mapMutations, mapGetters} from "vuex";
 
-export default {
-  components: {
-    Card
-  },
+  export default {
+    components: {
+      Card
+    },
 
-  data() {
-    return {
-      width: '48px',
-      Item: {},
-      type: [
-        {
-          name: "标签",
-          typeName: "tag",
-          list: [
-            { name: "全部", id: "" },
-            { name: "Javascript", id: 1 },
-            { name: "Vue", id: 2 },
-            { name: "Http", id: 3 }
-          ],
-          default: ""
+    data() {
+      return {
+        width: '48px',
+        Item: {},
+//      type: ,
+        IPara: {
+          tag: [],
+          type: "",
+          isPublish: "",
+          state: ""
         },
-        {
-          name: "分类",
-          typeName: "type",
-          list: [
-            { name: "全部", id: "" },
-            { name: "Code", id: 1 },
-            { name: "Think", id: 2 },
-            { name: "Music", id: 3 }
-          ],
-          default: ""
-        },
-        {
-          name: "公开",
-          typeName: "publish",
-          list: [
-            { name: "全部", id: "" },
-            { name: "公开", id: 1 },
-            { name: "私密", id: 2 }
-          ],
-          default: ""
-        },
-        {
-          name: "状态",
-          typeName: "state",
-          list: [
-            { name: "全部", id: "" },
-            { name: "已发布", id: 1 },
-            { name: "草稿", id: 2 }
-          ],
-          default: ""
-        }
-      ],
-      IPara: {
-        tag: "",
-        type: "",
-        publish: "",
-        state: ""
-      },
-      keyword:'',
-      currentPage: 1
-    };
-  },
+        keyword: '',
+        currentPage: 1
+      };
+    },
 
 
-  computed:{
-    ...mapState({
-      articles: state => state.articles.articles,
+    computed: {
+      ...mapState({
+        articles: state => state.articles.articles,
 //      noMore: state => state.article.noMoreData,
-      page: state => state.articles.page,
-      defaultLimit: state => state.articles.defaultLimit,
-      fetch: state => state.articles.fetch,
-      list: state => state.articles.list,
-      total: state => state.articles.total,
-      tag: state => state.articles.tag.list,
+        page: state => state.articles.page,
+        defaultLimit: state => state.articles.defaultLimit,
+        fetch: state => state.articles.fetch,
+        list: state => state.articles.list,
+        total: state => state.articles.total,
+        tag: state => state.articles.tag.list,
+        tags: state => state.articles.tags
+      }),
 
-    }),
-  },
-
-
-  created() {
-    this.getData()
-  },
-
-  methods: {
-    ...mapActions({
-      getAllArticles: "articles/GET_ALL_ARTICLES",
-      patchActicle: 'articles/PATCH_ARTICLE'
-    }),
-
-    changeState (row, params) {
-      console.log('row',params)
-      this.patchActicle({
-        article: row,
-        ...params
-      })
+      type() {
+        return [
+          {
+            type: 'multiple',
+            name: "标签",
+            typeName: "tag",
+            list: ['全部',...this.tags],
+            default: ['全部']
+          },
+          {
+            name: "分类",
+            typeName: "type",
+            list: [
+              {name: "全部", id: ""},
+              {name: "Code", id: 1},
+              {name: "Think", id: 2},
+              {name: "Music", id: 3}
+            ],
+            default: ""
+          },
+          {
+            name: "公开",
+            typeName: "isPublish",
+            list: [
+              {name: "全部", id: ""},
+              {name: "公开", id: true},
+              {name: "私密", id: false}
+            ],
+            default: ""
+          },
+          {
+            name: "状态",
+            typeName: "state",
+            list: [
+              {name: "全部", id: ""},
+              {name: "已发布", id: 1},
+              {name: "草稿", id: 2}
+            ],
+            default: ""
+          }
+        ]
+      }
     },
 
-    pageChange(val) {
-      this.currentPage = val
+
+    created() {
       this.getData()
-    },
+      this.getTags()
+    }
+    ,
 
-    changeType(e) {
-      this.para[e.typeName] = e.id
-      this.getData()
-    },
+    methods: {
+      ...
+        mapActions({
+          getAllArticles: "articles/GET_ALL_ARTICLES",
+          patchActicle: 'articles/PATCH_ARTICLE',
+          getTags: 'articles/GET_TAGS'
+        }),
 
-    edit(row) {
-      this.$router.push(`/article/release?id=${row._id}`)
-    },
+      changeState(row, params) {
+        console.log('row', params)
+        this.patchActicle({
+          article: row,
+          ...params
+        })
+      }
+      ,
 
-    dele(row) {
-      this.$confirm('确定删除此文章吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async () => {
-        const res = await this.$store.dispatch('article/deleteArt', { _id: row._id })
-        if (res.code === 1) this.getData()
-      }).catch(error => console.error(error))
-    },
-    async getData() {
-      await this.getAllArticles({
-        page: this.page || 1,
-        limit: this.defaultLimit || 8,
-        isPublish: true
-      })
-    },
+      pageChange(val) {
+        this.currentPage = val
+        this.getData()
+      }
+      ,
+
+      changeType(e) {
+        console.log('eeeeeeeeeee', e)
+        if (Array.isArray(e.id)) {
+          this.IPara[e.typeName] = e.id
+        } else {
+          this.IPara[e.typeName] = e.id
+        }
+
+        this.getData()
+      }
+      ,
+
+      edit(row) {
+        this.$router.push(`/article/release?id=${row._id}`)
+      }
+      ,
+
+      dele(row) {
+        this.$confirm('确定删除此文章吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const res = await this.$store.dispatch('article/deleteArt', {_id: row._id})
+          if (res.code === 1) this.getData()
+        }).catch(error => console.error(error))
+      },
+
+      async getData() {
+        const {tag, type, isPublish, state} = this.IPara
+        let tags = [...tag]
+        if(tags) tags.splice(0,1)
+        await
+          this.getAllArticles({
+            page: this.page || 1,
+            limit: this.defaultLimit || 8,
+            tags: tags.join(','),
+            type: type,
+            isPublish: isPublish,
+            state: state
+          })
+      },
+    }
+
+
   }
-
-
-};
+  ;
 </script>
 
-<style lang="scss" >
-@import "../../assets/scss/variable.scss";
+<style lang="scss">
+  @import "../../assets/scss/variable.scss";
 
-.article {
-  height: 100%;
+  .article {
+    height: 100%;
 
-  > .el-card {
-    margin-bottom: $normal-pad;
+    > .el-card {
+      margin-bottom: $normal-pad;
+    }
+
+    .table-expand {
+      font-size: 0;
+    }
+
+    .table-expand label {
+      width: 70px;
+      color: #99a9bf;
+    }
+
+    .table-expand .el-form-item {
+      margin-right: 0;
+      margin-bottom: 0;
+    }
+
+    .article-link {
+      text-decoration: underline;
+    }
   }
-
-  .table-expand {
-    font-size: 0;
-  }
-
-  .table-expand label {
-    width: 70px;
-    color: #99a9bf;
-  }
-
-  .table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-  }
-
-  .article-link {
-    text-decoration: underline;
-  }
-}
 </style>

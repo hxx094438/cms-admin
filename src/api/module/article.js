@@ -7,6 +7,12 @@ export function getAllArticles ( params ) {
     .catch(e => console.error(e))
 }
 
+export function getTags ( params ) {
+  return ax.get('/articles/tags', {params})
+    .then(res => res.data)
+    .catch(e => console.error(e))
+}
+
 
 // 修改文章状态
 export function patchArt ( params ) {

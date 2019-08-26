@@ -2,7 +2,25 @@
      <el-card class="box-card" v-loading="carLoading">
       <div v-for="(items, index) in type" class="item" :key="index">
         <span class="text" :style="{'width': width}">{{ items.name }}：</span>
+        <el-checkbox-group
+          v-model="items.default"
+          size="small"
+          @change.native="toggle(items.default, items.typeName)"
+          v-if="items.type === 'multiple'"
+        >
+          <transition-group name="list" tag="div">
+            <el-checkbox-button
+              v-for="item in items.list"
+              class="btn"
+              :key="item"
+              :label="item"
+              >
+              {{ item }}
+            </el-checkbox-button>
+          </transition-group>
+        </el-checkbox-group>
         <el-radio-group
+          v-else
           v-model="items.default"
           size="small"
           @change.native="toggle(items.default, items.typeName)">
@@ -27,9 +45,10 @@ export default{
 props: ['carLoading','width','type'],
 
 methods:{
-  toggle(e,typeName) {
-        this.$emit('toggle', { typeName, id: e })
-  }
+  toggle(def ,typeName, type = '') {
+        this.$emit('toggle', { id: def ,  typeName})
+  },
+
 }
 
 }
