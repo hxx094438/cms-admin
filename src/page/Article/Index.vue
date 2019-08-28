@@ -284,7 +284,7 @@
       ,
 
       edit(row) {
-        this.$router.push(`/article/release?id=${row._id}`)
+        this.$router.push(`/article/release?id=${row.aid}`)
       }
       ,
 
