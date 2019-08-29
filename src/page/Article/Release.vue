@@ -1,5 +1,6 @@
 <template>
-  <div class="release" v-loading="fetch">
+<!-- v-loading="fetch" -->
+  <div class="release" >
     <el-form
       :model="form"
       label-width="100px"
@@ -128,12 +129,26 @@
   //    import {Component, Vue, Watch} from 'vue-property-decorator'
   //    import {error} from '../../utils/response'
   //    import {Route, RawLocation} from 'vue-router'
+  import MarkdownEditor from '../../components/markdown'
+  const content = `
+  **this is test**
+  * vue
+  * element
+  1. markdown
+  2. editor
+  ## Simplemde
+  [link](https://www.baidu.com) 
+  ![图片](https://i.imgur.com/sZlktY7.png)
+  `
+
   import {mapActions, mapState, mapMutations, mapGetters} from "vuex";
 
   export default {
-    components: {},
+    components: { MarkdownEditor },
     data() {
       return {
+        content: content,
+        html: '',
         configs: {
           status: false,
           indentWithTabs: false,
@@ -170,7 +185,8 @@
       },
 
       tags() {
-        return this.$store.state.tag.list.map((item) => ({name: item.name, _id: item._id}))
+        // return this.$store.state.tag.list.map((item) => ({name: item.name, _id: item._id}))
+        return []
       },
     },
 
