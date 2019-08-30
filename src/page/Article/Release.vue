@@ -178,15 +178,16 @@
 
       ...mapState({
         posting: state => state.articles.posting,
+        detail: state => state.articles.detail,
+//        list: state => state.tag.list
       }),
-
-      detail() {
-        return this.$store.state.article.detail
-      },
+//
+//      detail() {
+//        return this.$store.state.article.detail
+//      },
 
       tags() {
-        // return this.$store.state.tag.list.map((item) => ({name: item.name, _id: item._id}))
-        return []
+         return this.detail.tags
       },
     },
 
@@ -194,23 +195,28 @@
     created() {
       Promise.all([
         // 标签列表
-        this.$store.dispatch('tag/getTags', {
-          current_page: 1,
-          page_size: 100
-        }),
-        this.$store.dispatch('getQiniu')
+        this.getTags({})
+//        this.$store.dispatch('getQiniu')
       ])
 
-      this.qn.token = this.$store.state.QNtoken
+//      this.qn.token = this.$store.state.QNtoken
 
       // 文章详情
       if (this.$route.query.id) {
         // this.id = this.$route.query.id
-        this.$store.dispatch('article/getArt', {_id: this.id})
+        this.getArticle(this.$route.query.id)
       }
     },
 
     methods: {
+
+      ...
+        mapActions({
+          getTags: 'tag/GET_TAGS',
+          getArticle: "articles/GET_ARTICLE",
+        }),
+
+
       fetch() {
         return this.$store.state.article.fetch
       },

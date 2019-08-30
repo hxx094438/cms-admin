@@ -15,16 +15,17 @@ export default {
     posting: false,
     fetch: false,
     list: [],
-    detail: {
-      title: '',
-      keyword: '',
-      thumb: '',
-      state: 0,
-      publish: 0,
-      type: 0,
-      descript: '',
-      tag: []
-    },
+    detail: {},
+    // detail: {
+    //   title: '',
+    //   keyword: '',
+    //   thumb: '',
+    //   state: 0,
+    //   publish: 0,
+    //   type: 0,
+    //   descript: '',
+    //   tag: []
+    // },
     tags: []
   },
   mutations: {
@@ -38,6 +39,11 @@ export default {
 
     ADD_ARTICLES(state, articles) {
       state.articles = [...state.articles, ...articles]
+    },
+
+    SET_ARTICLE(state, article) {
+      state.detail = article
+      state.fetch = false
     },
 
     SET_TAGS: (state, tags) => {
@@ -151,13 +157,7 @@ export default {
 
 
     GET_ARTICLE({commit, state}, aid) {
-      // const startTime = beginLoading(commit, false);
-      // if (router.currentRoute.hash) {
-      //   commit('isLoading_toggle', false)
-      // }
-      // document.title = '加载中...'
-      console.log('-----------111')
-      return model.getArticle(aid)
+      return service.getArticle(aid)
         .then(res => {
           const {data, message} = res
           if( data.code === 0) {

@@ -5,6 +5,7 @@ import actions from './actions.js'
 import getters from './getters.js'
 import mutations from './mutations.js'
 import articles from './modules/articles'
+import tag from './modules/tag'
 
 
 Vue.use(Vuex)
@@ -15,7 +16,8 @@ const store = new Vuex.Store({
   actions,
   mutations,
   modules: {
-    articles
+    articles,
+    tag,
   }
 })
 
@@ -26,6 +28,7 @@ if (module.hot) {
     './actions',
     './getters',
     './modules/articles',
+    './modules/tag',
   ], () => {
     const newState = require('./state').default;
     const newMutations = require('./mutations').default;
@@ -37,7 +40,8 @@ if (module.hot) {
       getters: newGetters,
       actions: newActions,
       modules: {
-        articles
+        articles,
+        tag,
       }
     });
   });

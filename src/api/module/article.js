@@ -7,6 +7,14 @@ export function getAllArticles ( params ) {
     .catch(e => console.error(e))
 }
 
+export function getArticle ( aid ) {
+  return ax.get(`/articles/${aid}`)
+    .then(res => res.data)
+    .catch(e => console.error(e))
+}
+
+
+
 export function getTags ( params ) {
   return ax.get('/articles/tags', {params})
     .then(res => res.data)
