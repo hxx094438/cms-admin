@@ -25,15 +25,16 @@
         </el-form-item>
         <el-form-item
           label="文章标签"
-          prop="tag"
+          v-if="Array.isArray(form.tags)"
+          prop="tags"
           :rules="[
             { required: true, type: 'array', message: '请选择文章标签', trigger: '' }
           ]">
-          <el-checkbox-group v-model="form.tag" fill="#324057" text-color="white">
+          <el-checkbox-group v-model="form.tags" fill="#324057" text-color="white">
             <el-checkbox-button
               v-for="item in tags"
-              :label="item._id"
-              :key="item._id">{{ item.name }}
+              :label="item"
+              :key="item">{{ item }}
             </el-checkbox-button>
           </el-checkbox-group>
         </el-form-item>
@@ -53,12 +54,14 @@
             { required: true, message: '请输入文章内容', trigger: 'blur, change' }
           ]"
           class="markdown">
-          <markdown-editor
+          <vue-simplemde
             v-model="form.content"
             ref="markdownEditor"
+            :id="form.aid"
             :configs="configs"
             :highlight="true"
-            preview-class="markdown-body"></markdown-editor>
+            preview-class="markdown-body">
+            </vue-simplemde>
         </el-form-item>
         <el-form-item style="margin-bottom: 0">
           <el-button
@@ -77,23 +80,39 @@
 
       <el-col :span="8" class="right">
         <div class="right-form">
-          <el-form-item label="文章分类" label-width="90px" style="margin-bottom: 10px;">
+          <el-form-item label="文章分类" label-width="90px" style="margin-bottom: 10px;"
+          :rules="[
+            { required: true, type: 'number', message: '请选择文章分类'}
+          ]"
+          prop="type"
+          >
             <el-radio-group v-model="form.type">
-              <el-radio :label="1">码农</el-radio>
-              <el-radio :label="2">读书</el-radio>
-              <el-radio :label="3">民谣</el-radio>
+              <el-radio :label=1>码农</el-radio>
+              <el-radio :label=2>读书</el-radio>
+              <el-radio :label=3>民谣</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="文章状态" label-width="90px" style="margin-bottom: 10px;">
+          <el-form-item label="文章状态" label-width="90px" style="margin-bottom: 10px;"
+          :rules="[
+            { required: true, type: 'number', message: '请选择文章状态'}
+          ]"
+          prop="state"
+          >
             <el-radio-group v-model="form.state">
-              <el-radio :label="1">发布</el-radio>
-              <el-radio :label="2">草稿</el-radio>
+              <el-radio :label=1>发布</el-radio>
+              <el-radio :label=2>草稿</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="文章公开" label-width="90px" style="margin-bottom: 10px;">
-            <el-radio-group v-model="form.publish">
-              <el-radio :label="1">公开</el-radio>
-              <el-radio :label="2">私密</el-radio>
+          <el-form-item label="文章公开" 
+          label-width="90px" 
+          style="margin-bottom: 10px;"
+          prop="isPublish"
+          :rules="[
+            { required: true, type: 'boolean', message: '请选择是否公开文章'}
+          ]">
+            <el-radio-group v-model="form.isPublish">
+              <el-radio :label="true">公开</el-radio>
+              <el-radio :label="false">私密</el-radio>
             </el-radio-group>
           </el-form-item>
         </div>
@@ -129,48 +148,49 @@
   //    import {Component, Vue, Watch} from 'vue-property-decorator'
   //    import {error} from '../../utils/response'
   //    import {Route, RawLocation} from 'vue-router'
-  import MarkdownEditor from '../../components/markdown'
-  const content = `
-  **this is test**
-  * vue
-  * element
-  1. markdown
-  2. editor
-  ## Simplemde
-  [link](https://www.baidu.com) 
-  ![图片](https://i.imgur.com/sZlktY7.png)
-  `
-
+  import VueSimplemde from 'vue-simplemde'
   import {mapActions, mapState, mapMutations, mapGetters} from "vuex";
 
   export default {
-    components: { MarkdownEditor },
+    components: { VueSimplemde },
     data() {
       return {
-        content: content,
+        content: `**this is test**
+          * vue
+          * element
+          1. markdown
+          2. editor
+          ## Simplemde
+          [link](https://www.baidu.com) 
+          ![图片](https://i.imgur.com/sZlktY7.png)`,
         html: '',
         configs: {
+          autosave: {
+            enabled: true,
+            uniqueId: 'MyUniqueID',
+            delay: 1000
+          },
           status: false,
           indentWithTabs: false,
           spellChecker: false
         },
         form: {
-          title: '',
-          keyword:'',
-          descript:'',
-          tag:[],
-          content:'',
-          publish:1,
-          state:1,
-          type:1,
-          thumb:''
+          // title: '',
+          // keyword:'',
+          // descript:'',
+          // tag:[],
+          // content:'',
+          // publish:1,
+          // state:1,
+          // type:1,
+          // thumb:''
         },
         qn: {
           token: '',
           key:''
         },
         percent: 0,
-        id:'',
+        // id:'',
       }
     },
 
@@ -185,9 +205,11 @@
 //      detail() {
 //        return this.$store.state.article.detail
 //      },
-
+      id () {
+        return this.$route.query.id
+      },
       tags() {
-         return this.detail.tags
+         return this.detail.tags || []
       },
     },
 
@@ -195,17 +217,13 @@
     created() {
       Promise.all([
         // 标签列表
-        this.getTags({})
+        this.getTags({}),
+        this.getArticle(this.id)
+
 //        this.$store.dispatch('getQiniu')
       ])
 
 //      this.qn.token = this.$store.state.QNtoken
-
-      // 文章详情
-      if (this.$route.query.id) {
-        // this.id = this.$route.query.id
-        this.getArticle(this.$route.query.id)
-      }
     },
 
     methods: {
@@ -214,6 +232,8 @@
         mapActions({
           getTags: 'tag/GET_TAGS',
           getArticle: "articles/GET_ARTICLE",
+          saveArticle: 'articles/SAVE_ARTICLE',
+          patchArticle: 'articles/PATCH_ARTICLE'
         }),
 
 
@@ -251,10 +271,16 @@
       submitForm(formName) {
         (this.$refs[formName] ).validate(async (valid) => {
           if (valid) {
+            console.log('thisadasd',this.form.content)
             let res
-            if (!this.form._id) res = await this.$store.dispatch('article/postArt', {...this.form})
-            else res = await this.$store.dispatch('article/putArt', {...this.form})
-            if (res.code === 1) this.$router.push('/article/index')
+            if (!this.id) {
+              res = await this.saveArticle({...this.form})
+            } 
+            else {
+              console.log('patch')
+               res = await this.patchArticle({...this.form})
+            }
+            if (res.code === 0) this.$router.push('/article/index')
             return true
           } else {
             return false
@@ -267,21 +293,26 @@
 
     beforeRouteUpdate(to, form, next) {
       this.id = ''
-      this.form = {
-        title: '',
-        keyword: '',
-        descript: '',
-        tag: [],
-        content: '',
-        publish: 1,
-        state: 1,
-        type: 1,
-        thumb: ''
-      }
+      // this.form = {
+      //   title: '',
+      //   keyword: '',
+      //   descript: '',
+      //   tags: [],
+      //   content: '',
+      //   publish: 1,
+      //   state: 1,
+      //   type: 1,
+      //   thumb: ''
+      // }
       next()
     },
 
     watch: {
+      detail(val) {
+        this.form = {
+          ...val
+        }
+      }
 //            @Watch('detail')
 //            private getArt(val
 //    :

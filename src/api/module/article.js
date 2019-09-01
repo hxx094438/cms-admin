@@ -9,11 +9,27 @@ export function getAllArticles ( params ) {
 
 export function getArticle ( aid ) {
   return ax.get(`/articles/${aid}`)
-    .then(res => res.data)
+    .then(res=> {
+      return res.data
+    })
     .catch(e => console.error(e))
 }
 
+export function saveArticle (params) {
+  return ax.post(`/articles/save`,params)
+  .then(res=> {
+    return res.data
+  })
+  .catch(e => console.error(e))
+}
 
+export function patchArticle (params) {
+  return ax.patch(`/articles/save/${params.aid}`,params)
+  .then(res=> {
+    return res.data
+  })
+  .catch(e => console.error(e))
+}
 
 export function getTags ( params ) {
   return ax.get('/articles/tags', {params})

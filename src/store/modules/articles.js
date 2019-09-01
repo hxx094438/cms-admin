@@ -159,8 +159,8 @@ export default {
     GET_ARTICLE({commit, state}, aid) {
       return service.getArticle(aid)
         .then(res => {
-          const {data, message} = res
-          if( data.code === 0) {
+          const {data, code, message} = res
+          if( code === 0) {
             commit('SET_ARTICLE', data)
           }
           // commit('set_headline', {content: state.article.title, animation: 'animated rotateIn'})
@@ -173,18 +173,17 @@ export default {
 
 
     SAVE_ARTICLE({state, commit}, payload) {
-      return service.saveArticle({article: state.article, ...payload})
-        .then(() => {
-          const {data, message} = res
-          if( data.code === 0) {
+    
+      return service.saveArticle(payload)
+        .then(res => {
+          const {data, code ,message} = res
+          if( code === 0) {
             console.log('保存成功')
+            return res
           }
-          // commit('isSaving_toggle', true)
-          // commit('isSend_toggle', true)
         }).catch((err) => {
           console.log(err)
         })
-      // }
     },
 
     UPDATE_ARTICLE_LIKE_ARR({state, commit}, payload) {
@@ -197,10 +196,10 @@ export default {
       params
     ) {
       console.log('PATCH_ARTICLE',params)
-      const res = await service.patchArt(params)
+      const res = await service.patchArticle(params)
       if (res && res.code === 0) {
         success('修改成功')
-        commit('PATCH_HERO_SUCCESS', params.article)
+        // commit('PATCH_HERO_SUCCESS', params)
       } else error(res.message)
       return res
     },
