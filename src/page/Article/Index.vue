@@ -118,7 +118,7 @@
                 type="success"
                 size="small"
                 key="4"
-                v-if="scope.row.state === 2"
+                v-if="scope.row.state === 0"
                 @click="changeState(scope.row, {state: 1})"
               >发布
               </el-button>
@@ -134,7 +134,6 @@
                 type="danger"
                 size="small"
                 key="6"
-                v-if="scope.row.state === 2"
                 :disabled="scope.row.deleteing"
                 @click="dele(scope.row)"
               >
@@ -257,9 +256,9 @@
         }),
 
       changeState(row, params) {
-        console.log('row', params)
+        console.log('row',row, params)
         this.patchActicle({
-          article: row,
+          ...row,
           ...params
         })
       }

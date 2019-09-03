@@ -127,6 +127,7 @@
               class="avatar-uploader"
               action="https://up.qbox.me/"
               :data="qn"
+              :drag="true"
               :show-file-list="false"
               :on-success="handleSuccess"
               :before-upload="beforeUpload"
@@ -145,9 +146,7 @@
 </template>
 
 <script>
-  //    import {Component, Vue, Watch} from 'vue-property-decorator'
-  //    import {error} from '../../utils/response'
-  //    import {Route, RawLocation} from 'vue-router'
+  import {error} from '../../utils/resp'
   import VueSimplemde from 'vue-simplemde'
   import {mapActions, mapState, mapMutations, mapGetters} from "vuex";
 
@@ -216,14 +215,12 @@
 
     created() {
       Promise.all([
-        // 标签列表
-        this.getTags({}),
-        this.getArticle(this.id)
-
-//        this.$store.dispatch('getQiniu')
+        this.getTags({}),        // 标签列表
+        this.getArticle(this.id),
+        this.getQiniu()
       ])
 
-//      this.qn.token = this.$store.state.QNtoken
+      this.qn.token = this.$store.state.QNtoken
     },
 
     methods: {
@@ -233,7 +230,8 @@
           getTags: 'tag/GET_TAGS',
           getArticle: "articles/GET_ARTICLE",
           saveArticle: 'articles/SAVE_ARTICLE',
-          patchArticle: 'articles/PATCH_ARTICLE'
+          patchArticle: 'articles/PATCH_ARTICLE',
+          getQiniu: 'GET_QINIU'
         }),
 
 
@@ -256,10 +254,10 @@
 
       beforeUpload(file) {
         this.qn.key = file.name
-        const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+        const isAlowFormat = file.type === 'image/jpeg' || file.type === 'image/png'
         const isLt10M = file.size / 1024 / 1024 < 10
 
-        if (!isJPG) {
+        if (!isAlowFormat) {
           error('上传头像图片只能是 JPG/PNG 格式!')
         }
         if (!isLt10M) {

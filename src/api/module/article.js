@@ -40,8 +40,16 @@ export function getTags ( params ) {
 
 // 修改文章状态
 export function patchArt ( params ) {
-  console.log('params',params)
   return ax.patch(`/articles/save/${params.article.aid}`, params)
+    .then(res => res.data)
+    .catch(e => console.error(e))
+}
+
+
+
+// 七牛
+export function getQiniu () {
+  return ax.get('/qiniu')
     .then(res => res.data)
     .catch(e => console.error(e))
 }
