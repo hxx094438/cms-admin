@@ -125,7 +125,7 @@
             prop="thumb">
             <el-upload
               class="avatar-uploader"
-              action="https://up.qbox.me/"
+              :action="upload_qiniu_url"
               :data="qn"
               :drag="true"
               :show-file-list="false"
@@ -174,20 +174,22 @@
           spellChecker: false
         },
         form: {
-          // title: '',
-          // keyword:'',
-          // descript:'',
-          // tag:[],
-          // content:'',
-          // publish:1,
-          // state:1,
-          // type:1,
-          // thumb:''
+          title: '',
+          keyword:'',
+          descript:'',
+          tag:[],
+          content:'',
+          isPublish: true,
+          state:1,
+          type:1,
+          thumb:''
         },
         qn: {
           token: '',
           key:''
         },
+        upload_qiniu_url:'http://upload-z2.qiniup.com',
+        upload_qiniu_addr: "http://pxan221gl.bkt.clouddn.com/",
         percent: 0,
         // id:'',
       }
@@ -198,12 +200,9 @@
       ...mapState({
         posting: state => state.articles.posting,
         detail: state => state.articles.detail,
+        QNtoken: state => state.QNtoken
 //        list: state => state.tag.list
       }),
-//
-//      detail() {
-//        return this.$store.state.article.detail
-//      },
       id () {
         return this.$route.query.id
       },
@@ -213,14 +212,13 @@
     },
 
 
-    created() {
-      Promise.all([
+    async created() {
+      await Promise.all([
         this.getTags({}),        // 标签列表
         this.getArticle(this.id),
         this.getQiniu()
       ])
-
-      this.qn.token = this.$store.state.QNtoken
+      this.qn.token = this.QNtoken
     },
 
     methods: {
@@ -239,9 +237,9 @@
         return this.$store.state.article.fetch
       },
 
-      handleSuccess() {
-        this.form.thumb = 'https://static.jkchao.cn/' + this.qn.key
-
+      handleSuccess(res) {
+        this.$set(this.form,'thumb',this.upload_qiniu_addr + res.key)
+        console.log('this.form.thumb',this.form.thumb)
       },
 
       handlePro(e) {
@@ -263,7 +261,7 @@
         if (!isLt10M) {
           error('上传头像图片大小不能超过 10MB!')
         }
-        return isJPG && isLt10M
+        return isAlowFormat && isLt10M
       },
 
       submitForm(formName) {
@@ -311,20 +309,6 @@
           ...val
         }
       }
-//            @Watch('detail')
-//            private getArt(val
-//    :
-//    StoreState.Article
-//    ):
-//    void {
-//        this.form = {
-//        ...val,
-//        tag: val.tag.map((item: StoreState.Tag) => item._id)
-//    }
-//    }
-      //            detail(val) {
-      //                this.getArt()
-      //            }
     }
   }
 
