@@ -103,7 +103,7 @@
                 size="small"
                 key="2"
                 v-if="scope.row.isPublish"
-                @click="changeState(scope.row, {isPublish: false})"
+                @click="changeState(scope.row, {isPublish: 0})"
               >私密
               </el-button>
               <el-button
@@ -111,7 +111,7 @@
                 size="small"
                 key="3"
                 v-else
-                @click="changeState(scope.row, {isPublish: true})"
+                @click="changeState(scope.row, {isPublish: 1})"
               >公开
               </el-button>
               <el-button
@@ -173,9 +173,9 @@
 //      type: ,
         IPara: {
           tag: [],
-          type: 1,
-          isPublish: true,
-          state: 1
+          type: undefined,
+          isPublish: undefined,
+          state: undefined
         },
         keyword: '',
         currentPage: 1
@@ -221,8 +221,8 @@
             typeName: "isPublish",
             list: [
               {name: "全部", id: ""},
-              {name: "公开", id: true},
-              {name: "私密", id: false}
+              {name: "公开", id: 1},
+              {name: "私密", id: 0}
             ],
             default: ""
           },
