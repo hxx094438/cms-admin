@@ -173,9 +173,9 @@
 //      type: ,
         IPara: {
           tag: [],
-          type: "",
-          isPublish: "",
-          state: ""
+          type: 1,
+          isPublish: true,
+          state: 1
         },
         keyword: '',
         currentPage: 1
@@ -202,8 +202,8 @@
             type: 'multiple',
             name: "标签",
             typeName: "tag",
-            list: ['全部',...this.tags],
-            default: ['全部']
+            list: [...this.tags],
+            default: []
           },
           {
             name: "分类",
@@ -271,13 +271,13 @@
       ,
 
       changeType(e) {
-        console.log('eeeeeeeeeee', e)
+        // e.id  , e.
+        console.log('e',e)
         if (Array.isArray(e.id)) {
           this.IPara[e.typeName] = e.id
         } else {
           this.IPara[e.typeName] = e.id
         }
-
         this.getData()
       }
       ,

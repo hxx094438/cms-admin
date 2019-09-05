@@ -83,7 +83,7 @@ methods:{
       text-align: right;
       font-size: 14px;
     }
-    
+
     .el-radio-group {
       display: flex;
       flex-wrap: wrap;
