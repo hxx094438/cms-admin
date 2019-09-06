@@ -256,7 +256,7 @@
         }),
 
       changeState(row, params) {
-        console.log('row',row, params)
+        console.log('row', row, params)
         this.patchActicle({
           ...row,
           ...params
@@ -271,8 +271,6 @@
       ,
 
       changeType(e) {
-        // e.id  , e.
-        console.log('e',e)
         if (Array.isArray(e.id)) {
           this.IPara[e.typeName] = e.id
         } else {
@@ -300,13 +298,14 @@
 
       async getData() {
         const {tag, type, isPublish, state} = this.IPara
-        let tags = [...tag]
-        if(tags) tags.splice(0,1)
+//        let tags = [...tag]
+//        if(tags) tags.splice(0,1)
+        console.log('tag', tag)
         await
           this.getAllArticles({
             page: this.page || 1,
             limit: this.defaultLimit || 8,
-            tags: tags.join(','),
+            tags: tag.join(','),
             type: type,
             isPublish: isPublish,
             state: state

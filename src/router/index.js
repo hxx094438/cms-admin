@@ -8,6 +8,7 @@ const Home = resolve => require(['@/page/Home/index'], resolve)
 const INDEX = resolve => require(['@/page/index'], resolve)
 const Article = resolve => require(['@/page/Article/Index'], resolve)
 const Release = resolve => require(['@/page/Article/Release'],resolve)
+const Comments = resolve => require(['@/page/Comments/Index'],resolve)
 
 Vue.use(Router)
 
@@ -47,6 +48,15 @@ export default new Router({
       children: [
         {path: '/article/index', component: Article, name: '文章列表', meta: {requiresAuth: false, icon: 'icon-list'}},
         {path: '/article/release', component: Release, name: '发布文章', meta: {requiresAuth: false, icon: 'icon-write'}}
+      ]
+    },
+    {
+      path: '/',
+      name: '评论',
+      component: INDEX,
+      meta: { leaf: true, icon: 'icon-comments' },
+      children: [
+        { path: '/comment', component: Comments, name: '评论', meta: { requiresAuth: false, icon: 'icon-comments' } }
       ]
     },
 

@@ -44,12 +44,3 @@ export function patchArt ( params ) {
     .then(res => res.data)
     .catch(e => console.error(e))
 }
-
-
-
-// 七牛
-export function getQiniu () {
-  return ax.get('/qiniu')
-    .then(res => res.data)
-    .catch(e => console.error(e))
-}
