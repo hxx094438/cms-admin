@@ -1,8 +1,9 @@
 // https://github.com/surmon-china/surmon.me/blob/b7d467e0bc6fde6ef24cfca1103253dcefe3b332/utils/comment-ua-parse.js
 
 // ua解析
-export const uaParse = (e) => {
+export function uaParse(e) {
   let r = []
+  console.log('e',e)
   let outputer = ''
   if ((r === e.match(/MSIE\s([^\s|]+)/gi))) {
     outputer = `<span class="ua_ie"><i class="iconfont icon-internet"></i> Internet Explorer | ${r[0]

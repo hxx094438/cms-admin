@@ -17,30 +17,32 @@ const state = {
 
 const actions = {
 
-  async getComments (
+  async GET_COMMENTS (
     { commit },
-    data
+    params
   ) {
     commit('REQUEST_LIST')
-    const res = await service.getComments(data)
-    if (res && res.code === 1) {
-      const list = res.result.data.map((item ) => {
+    const res = await service.getComments(params)
+    const {data, message, code} = res
+    if (code === 0) {
+      const list = data.map((item ) => {
         return { ...item, deleteing: false }
       })
-      const total = res.result.pagination.total
+      const total = data.length
       commit('REQUEST_LIST_SUCCESS', { list, total })
     } else commit('REQUEST_LIST_FAIL')
     return res
   },
 
   // 修改评论
-  async putComment (
+  async PUT_COMMENT (
     { commit },
     comment
   ) {
     commit('POSTING_COMMENT')
     const res = await service.putComment(comment)
-    if (res && res.code === 1) {
+    const {data, message, code} = res
+    if (code === 0) {
       success('修改成功')
       commit('PUT_COMMENT_SUCCESS', comment)
     } else error(res.message)
@@ -49,13 +51,14 @@ const actions = {
   },
 
   // 删除
-  async deleteComment (
+  async DEL_COMMENT (
     { commit },
     comment
   ) {
     commit('DELETE_COMMENT', comment)
     const res = await service.deleteComment(comment)
-    if (res && res.code === 1) success('删除成功')
+    const {data, message, code} = res
+    if (code === 0) success('删除成功')
     else error(res.message)
     commit('DELETE_COMMENT_FINAL', comment)
     return res
@@ -86,14 +89,16 @@ const mutations = {
     state,
     comment
   ) {
-    (state.list.find((item) => item._id === comment._id) ).deleteing = true
+    (state.list.find((item) => item.id === comment.id) ).deleteing = true
   },
 
   'DELETE_COMMENT_FINAL' (
     state,
     comment
   ) {
-    (state.list.find((item) => item._id === comment._id)).deleteing = false
+    (state.list.find((item) => item.id === comment.id)).deleteing = false
+    let index = state.list.findIndex((item => item.id === comment.id))
+    state.list.splice(index,1)
   },
 
   'POSTING_COMMENT' (

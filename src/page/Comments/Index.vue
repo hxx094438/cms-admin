@@ -56,7 +56,7 @@
           show-overflow-tooltip
           width="80">
           <template slot-scope="scope">
-            {{ scope.row.post_id }}
+            {{ scope.row.articleId }}
           </template>
         </el-table-column>
         <el-table-column
@@ -77,12 +77,12 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="site"
+          label="城市"
           label-class-name="head"
           min-width="120"
           show-overflow-tooltip>
           <template slot-scope="scope">
-            {{ scope.row.author.site || '' }}
+            {{ scope.row.author.city || '' }}
           </template>
         </el-table-column>
         <el-table-column
@@ -90,7 +90,7 @@
           width="200"
           label-class-name="head">
           <template slot-scope="scope">
-            {{ scope.row.create_at | format('yyyy-MM-dd hh.mm.ss')}}
+            {{ scope.row.date | format('yyyy-MM-dd hh.mm.ss')}}
           </template>
         </el-table-column>
         <el-table-column
@@ -138,7 +138,7 @@
                 type="danger"
                 size="small"
                 key="3"
-                @click="deleteComment(scope.row)"
+                @click="delComment(scope.row)"
                 :disabled="scope.row.deleteing">{{ scope.row.deleteing ? '删除中' : '删 除' }}
               </el-button>
             </transition-group>
@@ -235,20 +235,14 @@
         posting: state => state.comment.posting,
       }),
 
-      uaParse(ua) {
-        return uaParse(ua)
-      },
-
-      osParse(os) {
-        return osParse(os)
-      },
     },
 
     created() {
-      this.getComments({
-        current_page: 1,
-        page_size: 16
-      })
+      // this.getComments({
+      //   current_page: 1,
+      //   page_size: 16
+      // })
+      this.getData()
     },
 
     methods: {
@@ -271,17 +265,16 @@
         this.getData()
       },
 
-      deleteComment (row) {
+      delComment (row) {
         this.$confirm('确定删除此数据吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(async () => {
           const res = await this.deleteComment({
-            _id: row._id,
-            post_ids: row.post_id
+            id: row.id,
           })
-          if (res.code === 1) this.getData()
+          if (res.code === 0) this.getData()
         }).catch(error => console.error(error))
       },
 
@@ -300,12 +293,10 @@
             delete this.form.name
             const res = await this.putComment({
               ...this.form,
-              post_ids: this.form.post_id,
-              author: JSON.stringify(this.form.author)
             })
-            if (res.code === 1) {
+            if (res.code === 0) {
               this.dialogV = false
-              this.getData()
+              // this.getData()
             }
             return true
           } else return false
@@ -319,11 +310,20 @@
 
       getData() {
         this.getComments({
-          current_page: this.currentPage,
-          page_size: 16,
+          articleId: this.$route.query.id,
+          page: this.currentPage,
+          size: 16,
           keyword: this.keyword,
           state: this.state
         })
+      },
+
+      uaParse(ua) {
+        return uaParse(ua)
+      },
+
+      osParse(os) {
+        return osParse(os)
       },
 
 

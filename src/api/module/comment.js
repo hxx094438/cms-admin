@@ -2,7 +2,7 @@ import ax from '../axios'
 
 // 获取评论
 export function getComments (params) {
-  return ax.get('/comment', { params })
+  return ax.get('/comment/all', { params })
     .then(res => res.data)
     .catch(e => console.error(e))
 }
@@ -11,7 +11,7 @@ export function getComments (params) {
 export function deleteComment (
   params
 ) {
-  return ax.delete(`/comment/${params._id}`, { params })
+  return ax.delete(`/comment/${params.id}`, params)
     .then(res => res.data)
     .catch(e => console.error(e))
 }
@@ -20,7 +20,7 @@ export function deleteComment (
 export function putComment (
   params
 ){
-  return ax.put(`/comment/${params._id}`, params)
+  return ax.put(`/comment/${params.id}`, params)
     .then(res => res.data)
     .catch(e => console.error(e))
 }

@@ -6,6 +6,8 @@ import getters from './getters.js'
 import mutations from './mutations.js'
 import articles from './modules/articles'
 import tag from './modules/tag'
+import comment from './modules/comment'
+
 
 
 Vue.use(Vuex)
@@ -18,6 +20,7 @@ const store = new Vuex.Store({
   modules: {
     articles,
     tag,
+    comment,
   }
 })
 
@@ -29,6 +32,8 @@ if (module.hot) {
     './getters',
     './modules/articles',
     './modules/tag',
+    './modules/comment',
+
   ], () => {
     const newState = require('./state').default;
     const newMutations = require('./mutations').default;
@@ -42,6 +47,7 @@ if (module.hot) {
       modules: {
         articles,
         tag,
+        comment,
       }
     });
   });

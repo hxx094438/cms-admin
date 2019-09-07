@@ -88,9 +88,15 @@
             }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="300" label-class-name="head" fixed="right">
+        <el-table-column label="操作" width="380" label-class-name="head" fixed="right">
           <template slot-scope="scope">
             <transition-group name="btn" tag="div">
+              <el-button
+                type="info"
+                size="small"
+                @click="$router.push(`/comment?id=${scope.row.aid}`)"
+                key="-2">查看评论
+              </el-button>
               <el-button
                 type="info"
                 size="small"
