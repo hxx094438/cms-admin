@@ -5,12 +5,12 @@
       <div class="title">管理登录</div>
       <el-form :model="form" ref="form">
         <el-form-item
-          prop="username"
+          prop="name"
           :rules="[
             { required: true, message: '用户名', trigger: 'blur' },
             { min: 5, message: '用户名至少6位', trigger: 'blur' }
           ]">
-          <el-input placeholder="账号" v-model="form.username" :maxlength="40"></el-input>
+          <el-input placeholder="账号" v-model="form.name" :maxlength="40"></el-input>
         </el-form-item>
         <el-form-item
           prop="password"
@@ -36,21 +36,44 @@
 </template>
 
 <script>
+
+  import {mapActions, mapState, mapMutations, mapGetters} from "vuex";
+
 export default {
   data() {
     return {
       form: {
-        username: '',
+        name: '',
         password: ''
       },
       logining: false
     }
   },
 
+  computed: {
+    ...mapState({
+      isLogin: state => state.isLogin,
+    }),
+  },
+
 
   methods: {
+    ...
+        mapActions({
+          login: "login"
+        }),
     submit() {
-
+      this.$refs.form.validate(async (valid) => {
+        console.log('valid',valid)
+      if (valid) {
+        const data = await this.login({ ...this.form })
+        if (data.code !== 0) return false
+        this.$router.push(this.$route.query.redirect || '/home')
+        return true
+      } else {
+        return false
+      }
+    })
     }
   }
 

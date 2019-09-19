@@ -12,7 +12,17 @@ const Comments = resolve => require(['@/page/Comments/Index'],resolve)
 
 Vue.use(Router)
 
-export default new Router({
+function loginIn () {
+  if (!window.localStorage.getItem('TOKEN')) return false
+  const lifeTime = JSON.parse(window.localStorage.getItem('TOKEN') || '').lifeTime * 1000
+  const nowTime = (new Date()).getTime()
+  if (nowTime > lifeTime) return false
+  return true
+}
+
+const router = new Router({
+  mode: 'history',
+  base: __dirname,
   routes: [
     {
       path: '/',
@@ -26,7 +36,7 @@ export default new Router({
           component: Home,
           name: '我的面板',
           meta: {
-            requiresAuth: false
+            requiresAuth: true
           }
         }
       ]
@@ -37,6 +47,7 @@ export default new Router({
       component: LOGIN,
       meta: {
         title: '登录页面',
+        requiresAuth: false
       }
     },
 
@@ -44,7 +55,11 @@ export default new Router({
       path: '/',
       name: '文章管理',
       component: INDEX,
-      meta: {leaf: false, icon: 'icon-article'},
+      meta: {
+        leaf: false,
+        icon: 'icon-article',
+        requiresAuth: true
+      },
       children: [
         {path: '/article/index', component: Article, name: '文章列表', meta: {requiresAuth: false, icon: 'icon-list'}},
         {path: '/article/release', component: Release, name: '发布文章', meta: {requiresAuth: false, icon: 'icon-write'}}
@@ -54,7 +69,7 @@ export default new Router({
       path: '/',
       name: '评论',
       component: INDEX,
-      meta: { leaf: true, icon: 'icon-comments' },
+      meta: { leaf: true, icon: 'icon-comments',requiresAuth: true },
       children: [
         { path: '/comment', component: Comments, name: '评论', meta: { requiresAuth: false, icon: 'icon-comments' } }
       ]
@@ -62,4 +77,21 @@ export default new Router({
 
 
   ]
+},)
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!loginIn()) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
 })
+
+export default router
