@@ -12,13 +12,7 @@ const Comments = resolve => require(['@/page/Comments/Index'],resolve)
 
 Vue.use(Router)
 
-function loginIn () {
-  if (!window.localStorage.getItem('TOKEN')) return false
-  const lifeTime = JSON.parse(window.localStorage.getItem('TOKEN') || '').lifeTime * 1000
-  const nowTime = (new Date()).getTime()
-  if (nowTime > lifeTime) return false
-  return true
-}
+
 
 const router = new Router({
   mode: 'history',
@@ -74,14 +68,13 @@ const router = new Router({
         { path: '/comment', component: Comments, name: '评论', meta: { requiresAuth: false, icon: 'icon-comments' } }
       ]
     },
-
-
   ]
 },)
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!loginIn()) {
+    const token = JSON.parse(window.localStorage.getItem('TOKEN') || '')
+    if (!token) {
       next({
         path: '/login',
         query: { redirect: to.fullPath }

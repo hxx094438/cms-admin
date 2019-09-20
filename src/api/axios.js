@@ -10,43 +10,37 @@ const request = axios.create({
   baseURL: baseUrl
 })
 
+
+
 // 拦截器
-// ax.interceptors.request.use(
-//   (config) => {
-//     if (
-//       config.method === 'post' ||
-//       config.method === 'put' ||
-//       config.method === 'delete' ||
-//       config.method === 'patch'
-//     ) {
-//       config.data = querystring.stringify(config.data)
-//     }
-//     if (window.localStorage.getItem('TOKEN')) {
-//       config.headers.Authorization = `Bearer ${JSON.parse(window.localStorage.getItem('TOKEN') || '').token}`
-//     }
-//     return config
-//   },
-//   (error) => {
-//     return Promise.reject(error)
-//   }
-// )
-//
-// ax.interceptors.response.use(
-//   (response) => {
-//     return response
-//   },
-//   (error) => {
-//     if (!loginIn()) {
-//       app.$alert('用户信息已过期，请点击确定后重新登录。', '提示', {
-//         confirmButtonText: '确定',
-//         callback: action => app.$router.push({
-//           path: '/login',
-//           query: { redirect: app.$route.fullPath }
-//         })
-//       })
-//     }
-//     return Promise.reject(error)
-//   }
-// )
+request.interceptors.request.use(
+  (config) => {
+    if (window.localStorage.getItem('TOKEN')) {
+      config.headers.Authorization = `Bearer ${JSON.parse(window.localStorage.getItem('TOKEN') || '')}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+request.interceptors.response.use(
+  (res) => {
+    if(res.data.code === 401) {
+      app.$alert('用户信息已过期，请点击确定后重新登录。', '提示', {
+        confirmButtonText: '确定',
+        callback: action => app.$router.push({
+          path: '/login',
+          query: { redirect: app.$route.fullPath }
+        })
+      })
+    }
+    return res
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
 export default request

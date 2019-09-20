@@ -19,8 +19,9 @@ export default {
     commit('USER_LOGINING')
     const res = await service.login({ ...user })
     console.log('res',res)
-    if (res.code === 0) {
-      window.localStorage.setItem('TOKEN', JSON.stringify(res.result))
+    const {code , data} = res
+    if (code === 0) {
+      window.localStorage.setItem('TOKEN', JSON.stringify(data.token))
       success('登录成功')
     } else {
       error(res.message)
