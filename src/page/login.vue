@@ -64,7 +64,6 @@ export default {
         }),
     submit() {
       this.$refs.form.validate(async (valid) => {
-        console.log('valid',valid)
       if (valid) {
         const data = await this.login({ ...this.form })
         if (data.code !== 0) return false
