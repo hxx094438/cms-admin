@@ -16,7 +16,7 @@ const request = axios.create({
 request.interceptors.request.use(
   (config) => {
     if (window.localStorage.getItem('TOKEN')) {
-      config.headers.Authorization = `Bearer ${JSON.parse(window.localStorage.getItem('TOKEN') || '')}`
+      config.headers.Authorization = `Bearer ${window.localStorage.getItem('TOKEN')}`
     }
     return config
   },
