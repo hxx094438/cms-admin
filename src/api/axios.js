@@ -12,6 +12,19 @@ const request = axios.create({
 
 
 
+request.interceptors.request.use(
+  config => {
+    if(config.method === 'get') {
+      config.params && (config.params = JSON.stringify(config.params))
+    }
+    return config
+  },
+  err => {
+    return Promise.reject(err)
+  }
+)
+
+
 // 拦截器
 request.interceptors.request.use(
   (config) => {
