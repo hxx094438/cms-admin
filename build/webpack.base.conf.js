@@ -2,8 +2,8 @@
 const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const vueLoaderConfig = require('./vue-loader.conf')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -11,10 +11,10 @@ function resolve (dir) {
 
 const isDev = process.env.NODE_ENV === 'development'
 
-
-
+console.log('process.env.NODE_ENV',process.env.NODE_ENV, isDev)
 module.exports = {
   context: path.resolve(__dirname, '../'),
+  mode: isDev ? 'development' : 'production',
   entry: {
     app: './src/main.js'
   },
@@ -68,9 +68,17 @@ module.exports = {
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       },
-      
+      {
+        test: /\.css$/,
+        use: ['vue-style-loader','css-loader']
+      },
     ]
   },
+
+  plugins: [
+    new VueLoaderPlugin()
+  ],
+
   node: {
     // prevent webpack from injecting useless setImmediate polyfill because Vue
     // source contains it (although only uses it if it's native).
