@@ -4,6 +4,7 @@ const utils = require('./utils')
 const config = require('../config')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const vueLoaderConfig = require('./vue-loader.conf')
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -73,7 +74,10 @@ module.exports = {
   },
 
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new CaseSensitivePathsPlugin({
+      debug: false
+    })
   ],
 
   node: {
