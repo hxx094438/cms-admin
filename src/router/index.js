@@ -3,9 +3,9 @@ import Router from 'vue-router'
 import request from "../api/axios";
 
 const LOGIN = resolve => require(['@/page/login'], resolve)
-const Home = resolve => require(['@/page/Home/index'], resolve)
+const Home = resolve => require(['@/page/Home/Index'], resolve)
 
-const INDEX = resolve => require(['@/page/index'], resolve)
+const INDEX = resolve => require(['@/page/Index'], resolve)
 const Article = resolve => require(['@/page/Article/Index'], resolve)
 const Release = resolve => require(['@/page/Article/Release'],resolve)
 const Comments = resolve => require(['@/page/Comments/Index'],resolve)
