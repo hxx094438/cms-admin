@@ -1,0 +1,29 @@
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /root;
+
+        # Add index.php to the list if you are using PHP
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location /admin/ {
+            root /root/cms-admin/dist;
+            try_files $uri $uri/ /index.html;
+            index index.html index.htm;
+        }
+
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                proxy_pass http://127.0.0.1:3000;
+        }
+        location ~ .*\.(js|css|png|jpg|gif|swf|ico|pdf|mov|mp3|wav|json|woff2)$ {
+            proxy_pass http://127.0.0.1:3000;
+        }
+
+        location /api/ {
+            proxy_pass  http://127.0.0.1:3002/api/;
+        }
+}
