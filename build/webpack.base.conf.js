@@ -11,7 +11,6 @@ function resolve (dir) {
 
 const isDev = process.env.NODE_ENV === 'development'
 
-console.log('process.env.NODE_ENV',process.env.NODE_ENV, isDev)
 module.exports = {
   context: path.resolve(__dirname, '../'),
   mode: isDev ? 'development' : 'production',
