@@ -4,7 +4,9 @@ import querystring from 'querystring'
 // import { loginIn } from '../utils/loginIn'
 import app from '../main'
 
-const baseUrl = 'http://127.0.0.1:3002/api'
+const isDev = process.env.NODE_ENV !== 'production'
+
+const baseUrl = isDev ? 'http://127.0.0.1:3002/api' : `http://shawsen.site/api`
 axios.defaults.withCredentials = true
 const request = axios.create({
   baseURL: baseUrl
