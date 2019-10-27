@@ -8,12 +8,14 @@ const baseWebpackConfig = require('./webpack.base.conf')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 
 const webpackConfig = merge(baseWebpackConfig, {
+  mode: 'production',
   module: {
     rules: [
       {
@@ -43,25 +45,60 @@ const webpackConfig = merge(baseWebpackConfig, {
       }
     ],
   },
+  // entry: {
+  //   vendors: ['vue', 'vuex', 'vue-router'],
+  // },
   optimization: {
-    //其他配置
+    //管理是否需要分包的清单
     runtimeChunk: {
       name: 'manifest'
     },
+    usedExports: true,
+    //取代 new webpack.optimize.ModuleConcatenationPlugin()
+    concatenateModules: true,
+    //识别package.json中的sideEffects以剔除无用的模块，用来做tree-shake
+    sideEffects: true,
+    // 编译错误时不打印输出资源
+    noEmitOnErrors: true,
     splitChunks: {
-
+      chunks: 'all', //同步异步全部打包
+      minSize: 30000, // 打包文件大于这个字节才会被拆分
+      minChunks: 1, // 文件最低被引用多少次才会被分包
+      maxAsyncRequests: 5, 
+      maxInitialRequests: 3,
+      automaticNameDelimiter: '-', // 连接符
+      name: true,
       cacheGroups: {
-        commons: {
-          name: "commons",
-          chunks: "initial",
-          minChunks: 2,
-          minSize: 0,
-          priority: 5,
+        highlight: {
+          name: "highlight", // 单独将 elementUI 拆包
+          minChunks:1, // 代码里面最少被引入1次就可以使用该规则。
+          priority: 70, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
+          test: /(highlight)/
         },
         elementUI: {
-          name: "chunk-elementUI", // 单独将 elementUI 拆包
-          priority: 20, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
-          test: /[\\/]node_modules[\\/]element-ui[\\/]/
+          name: 'elementUI',
+          priority:80,
+          test: /(element-ui)/
+        },
+        // vendors: {
+        //   chunks: 'async',
+        //   minChunks: 2,
+        //   maxInitialRequests: 5,
+        //   minSize: 0, 
+        //   priority:50,
+        //   name: 'vendors',
+        //   reuseExistingChunk: true, //比如a.js 引用了 b.js；如果b.js在之前已经被拆分过，则这里不再对其进行拆分
+        // },
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors'
+        },
+        
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true, //比如a.js 引用了 b.js；如果b.js在之前已经被拆分过，则这里不再对其进行拆分
+          filename: 'common.js'
         },
         styles: {
           name: 'styles',
@@ -79,10 +116,26 @@ const webpackConfig = merge(baseWebpackConfig, {
         parallel: true,
         sourceMap: false,
       }),
-      new OptimizeCSSPlugin({})
+      new OptimizeCSSPlugin({}),
+      new CompressionWebpackPlugin({
+        filename: '[path].gz[query]', // 生成资源的名字 [path].gz[query] 是默认名字
+        algorithm: 'gzip', // 压缩算法
+        test: /\.(js|css|html|svg)$/, // 匹配的资源
+        compressionOptions: { level: 8 }, // 压缩等级 默认9级
+        threshold: 10240, // 多大资源使用才压缩 10kb
+        minRatio: 0.8,
+        //仅处理压缩比此比率更好的资源（minRatio =压缩尺寸/原始尺寸）。
+        //示例：您拥有1024b大小的image.png文件，压缩版本的文件大小为768b，
+        //因此minRatio等于0.75。换句话说，当压缩大小/原始大小值小于minRatio值时，
+        //将处理资源。默认 0.8 。
+        deleteOriginalAssets: false, // 是否删除原始资产。
+      }),
+      new TerserPlugin({
+        parallel: true,
+      }),
     ]
   },
-  devtool: config.build.productionSourceMap ? config.build.devtool : false,
+  // devtool: config.build.productionSourceMap ? config.build.devtool : false,
   output: {
     path: config.build.assetsRoot,
     // filename: utils.assetsPath('js/[name].[chunkhash].js'),
@@ -92,7 +145,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // extract css into its own file
     new MiniCssExtractPlugin({
       filename: utils.assetsPath('css/[name].[contenthash].css'),
-      chunkFilename: utils.assetsPath('css/[id].css')
+      chunkFilename: utils.assetsPath('css/[id].[contenthash].css')
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
@@ -138,27 +191,18 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ])
+    ]),
+
   ]
 })
 
-if (config.build.productionGzip) {
-  const CompressionWebpackPlugin = require('compression-webpack-plugin')
+// if (config.build.productionGzip) {
+//   const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
-  webpackConfig.plugins.push(
-    new CompressionWebpackPlugin({
-      asset: '[path].gz[query]',
-      algorithm: 'gzip',
-      test: new RegExp(
-        '\\.(' +
-        config.build.productionGzipExtensions.join('|') +
-        ')$'
-      ),
-      threshold: 10240,
-      minRatio: 0.8
-    })
-  )
-}
+//   webpackConfig.plugins.push(
+    
+//   )
+// }
 
 if (config.build.bundleAnalyzerReport) {
   const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
