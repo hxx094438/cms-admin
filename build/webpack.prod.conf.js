@@ -64,41 +64,32 @@ const webpackConfig = merge(baseWebpackConfig, {
       chunks: 'all', //同步异步全部打包
       minSize: 30000, // 打包文件大于这个字节才会被拆分
       minChunks: 1, // 文件最低被引用多少次才会被分包
-      maxAsyncRequests: 5, 
-      maxInitialRequests: 3,
+      maxAsyncRequests: 5,  //用来限制异步模块内部的并行最大请求数
+      maxInitialRequests: 5, // 用来限制入口的拆分数量
       automaticNameDelimiter: '-', // 连接符
       name: true,
       cacheGroups: {
-        highlight: {
-          name: "highlight", // 单独将 elementUI 拆包
-          minChunks:1, // 代码里面最少被引入1次就可以使用该规则。
-          priority: 70, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
-          test: /(highlight)/
+        libs: {
+          name: "chunk-libs",
+          test: /[\\/]node_modules[\\/]/,
+          priority: 10,
+          chunks: "initial" // 只打包初始时依赖的第三方
+        },
+        vendor: {
+          test: /(vue|vuex|vue-router)/,
+          priority: 40,
+          name: 'vue-vendor'
         },
         elementUI: {
-          name: 'elementUI',
-          priority:80,
+          name: "elementUI", // 单独将 elementUI 拆包
+          priority: 50, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
           test: /(element-ui)/
         },
-        // vendors: {
-        //   chunks: 'async',
-        //   minChunks: 2,
-        //   maxInitialRequests: 5,
-        //   minSize: 0, 
-        //   priority:50,
-        //   name: 'vendors',
-        //   reuseExistingChunk: true, //比如a.js 引用了 b.js；如果b.js在之前已经被拆分过，则这里不再对其进行拆分
-        // },
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors'
-        },
-        
-        default: {
-          minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true, //比如a.js 引用了 b.js；如果b.js在之前已经被拆分过，则这里不再对其进行拆分
-          filename: 'common.js'
+        highlight: {
+          name: "highlight", // 单独将 elementUI 拆包
+          minChunks: 1, // 代码里面最少被引入1次就可以使用该规则。
+          priority: 30, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
+          test: /(highlight)/
         },
         styles: {
           name: 'styles',
