@@ -45,9 +45,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       }
     ],
   },
-  // entry: {
-  //   vendors: ['vue', 'vuex', 'vue-router'],
-  // },
+
   optimization: {
     //管理是否需要分包的清单
     runtimeChunk: {
@@ -85,11 +83,12 @@ const webpackConfig = merge(baseWebpackConfig, {
           priority: 50, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
           test: /(element-ui)/
         },
-        highlight: {
-          name: "highlight", // 单独将 elementUI 拆包
-          minChunks: 1, // 代码里面最少被引入1次就可以使用该规则。
-          priority: 30, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
-          test: /(highlight)/
+        markdown: {
+          name: "markdown",
+          minChunks: 1,
+          priority: 30,
+          test: /(highlight)|(simplemde)|(codemirror)|(marked)/,
+          // enforce: true  //强制分包，忽略minchunks,maxInitialRequests等限制条件
         },
         styles: {
           name: 'styles',
